@@ -1,0 +1,11 @@
+version: '{branch}.{build}'
+pull_requests:
+  do_not_increment_build_number: true
+skip_tags: true
+max_jobs: 1
+image: Visual Studio 2017
+install:
+  - cmd: .\gradlew.bat clean
+build: off
+test_script:
+  - cmd: .\gradlew.bat check

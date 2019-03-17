@@ -4,6 +4,7 @@ import solstice.data.RestTemplates.CharacterPublic;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 
 @Entity
@@ -11,11 +12,15 @@ import java.time.ZonedDateTime;
 public class CharacterEntity extends AbstractModel<CharacterMeta>{
     private String name;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private CorporationEntity corporationEntity;
+    @Transient
+    private Integer corporationIdTransient; //required
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private AllianceEntity allianceEntity;
+    @Transient
+    private Integer allianceIdTransient;    //optional
 
     private Integer ancestry_id;
     private ZonedDateTime birthday;
@@ -26,11 +31,6 @@ public class CharacterEntity extends AbstractModel<CharacterMeta>{
     private String gender;
     private Integer race_id;
     private Float security_status;
-
-    @Transient
-    private Integer corporationIdTransient;
-    @Transient
-    private Integer allianceIdTransient;
 
     protected CharacterEntity(){}
 
@@ -45,17 +45,20 @@ public class CharacterEntity extends AbstractModel<CharacterMeta>{
         return name;
     }
 
-    public Integer getAllianceIdTransient() {
-        return allianceIdTransient;
-    }
 
     public void setCorporationEntity(CorporationEntity corporationEntity) {
         this.corporationEntity = corporationEntity;
     }
 
+    public void setAllianceEntity(Optional<AllianceEntity> allianceEntity){
+        this.allianceEntity = allianceEntity.isPresent() ? allianceEntity.get() : null;
+    }
+
     public CorporationEntity getCorporationEntity() {
         return corporationEntity;
     }
+
+    public AllianceEntity getAllianceEntity() {return allianceEntity;}
 
     public void setCorporationIdTransient(Integer corporationIdTransient) {
         this.corporationIdTransient = corporationIdTransient;
@@ -65,39 +68,13 @@ public class CharacterEntity extends AbstractModel<CharacterMeta>{
         this.allianceIdTransient = allianceIdTransient;
     }
 
-    public Boolean updateFkCorp(){
-        if (corporationIdTransient == null){
-            corporationEntity = null;
-            return false;
-        }
-        else{
-            if (corporationEntity == null){
-                return true;
-            }
-            return !corporationIdTransient.equals(corporationEntity.getId());
-        }
-    }
-
-    public Boolean updateFkAlliance(){
-        if (allianceIdTransient == null){
-            allianceEntity = null;
-            return false;
-        }
-        else{
-            if (allianceEntity == null){
-                return true;
-            }
-            return !allianceIdTransient.equals(allianceEntity.getId());
-        }
-    }
-
     public void updateFromRestTemplate(CharacterPublic t) {
         this.allianceIdTransient = t.getAlliance_id();
         this.ancestry_id = t.getAncestry_id();
         this.birthday = t.getBirthday();
         this.bloodline_id = t.getBloodline_id();
         this.corporationIdTransient = t.getCorporation_id();
-        this.description = t.getDescription();
+        //this.description = t.getDescription();
         this.faction_id = t.getFaction_id();
         this.gender = t.getGender();
         this.name = t.getName();
@@ -123,6 +100,10 @@ public class CharacterEntity extends AbstractModel<CharacterMeta>{
 
     public Integer getCorporationIdTransient() {
         return corporationIdTransient;
+    }
+
+    public Optional<Integer> getAllianceIdTransient() {
+        return Optional.ofNullable(allianceIdTransient);
     }
 
     public String getDescription() {

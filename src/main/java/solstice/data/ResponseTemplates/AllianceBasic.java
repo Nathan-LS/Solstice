@@ -2,7 +2,7 @@ package solstice.data.ResponseTemplates;
 
 import solstice.data.entity.AllianceEntity;
 
-public class AllianceBasic {
+class AllianceBasic {
     private Integer id;
     private String name;
     private String ticker;
@@ -10,7 +10,7 @@ public class AllianceBasic {
     public AllianceBasic(AllianceEntity allianceEntity){
         id = allianceEntity.getId();
         name = allianceEntity.getName();
-        //ticker = allianceEntity.getTicker();
+        ticker = allianceEntity.getTicker();
     }
 
     public Integer getId() {

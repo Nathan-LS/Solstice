@@ -17,7 +17,7 @@ public class EntityBasic {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private AllianceBasic alliance;
 
-    public EntityBasic(@Nullable CharacterEntity characterEntity, @Nullable CorporationEntity corporationEntity, @Nullable AllianceEntity allianceEntity){
+    public EntityBasic(CharacterEntity characterEntity, CorporationEntity corporationEntity, AllianceEntity allianceEntity){
         if (characterEntity != null) {
             character = new CharacterBasic(characterEntity);
         }

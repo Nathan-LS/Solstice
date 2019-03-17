@@ -3,7 +3,7 @@ package solstice.data.ResponseTemplates;
 import solstice.data.entity.CharacterEntity;
 
 
-public class CharacterBasic {
+class CharacterBasic {
     private Integer id;
     private String name;
 

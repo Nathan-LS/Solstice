@@ -2,7 +2,7 @@ package solstice.data.ResponseTemplates;
 
 import solstice.data.entity.CorporationEntity;
 
-public class CorporationBasic {
+class CorporationBasic {
     private Integer id;
     private String name;
     private String ticker;

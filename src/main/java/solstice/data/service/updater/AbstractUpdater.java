@@ -1,5 +1,6 @@
 package solstice.data.service.updater;
 
+import org.springframework.transaction.annotation.Transactional;
 import solstice.data.RestTemplates.AbstractRestTemplate;
 import solstice.data.entity.AbstractModel;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,10 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+@Transactional
 public abstract class AbstractUpdater<T extends AbstractModel, S extends AbstractRestTemplate> {
     abstract protected String requestUrl(Integer entityId);
     abstract protected Class<S> apiModel();
@@ -17,6 +22,14 @@ public abstract class AbstractUpdater<T extends AbstractModel, S extends Abstrac
     abstract protected T getOrCreate(Integer id);
     abstract protected void updateFromRestTemplate(T model, S apiTemplate);
     abstract T repoSave(T model);
+
+    protected Optional<T> getOrCreate(Optional<Integer> identifier){
+        if (identifier.isPresent()){
+            return Optional.of(getOrCreate(identifier.get()));
+        }else{
+            return Optional.empty();
+        }
+    }
 
     protected void doApiUpdate(T model) throws ResponseStatusException {
         RestTemplate restTemplate = new RestTemplate();
@@ -44,17 +57,44 @@ public abstract class AbstractUpdater<T extends AbstractModel, S extends Abstrac
         }
     }
 
-    public T getModel(Integer id) throws ResponseStatusException {
-        T c = getOrCreate(id);
+    protected T checkDoUpdate(T model) throws ResponseStatusException{
         try {
-            c.getMeta().ensureValid();
-            if (c.needApiUpdate()) {
-                doApiUpdate(c);
+            model.getMeta().ensureValid();
+            if (model.needApiUpdate()) {
+                doApiUpdate(model);
             }
-        } finally {
-            c.getMeta().queryIncrement();
-            c = repoSave(c);
+        }finally{
+            model.getMeta().queryIncrement();
         }
-        return c;
+        return model;
     }
+
+    public T getModelNoCommit(Integer id) throws ResponseStatusException{
+        return checkDoUpdate(getOrCreate(id));
+    }
+
+    public Optional<T> getModelNoCommit(Optional<Integer> id) throws ResponseStatusException{
+        try{
+            return Optional.of(getModelNoCommit(id.get()));
+        }catch (NoSuchElementException ex){
+            return Optional.empty();
+        }
+    }
+
+    public T getModel(Integer id) throws ResponseStatusException {
+        if (id == null){
+            return null;
+        }
+        return repoSave(checkDoUpdate(getOrCreate(id)));
+    }
+
+    public T getModel(T entity)throws ResponseStatusException {
+        if (entity == null){
+            return null;
+        }
+        else {
+            return getModel(entity.getId());
+        }
+    }
+
 }

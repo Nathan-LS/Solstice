@@ -28,7 +28,7 @@ public abstract class AbstractMeta<T extends AbstractModel> {
     Boolean validEntity = true;
 
     @NotNull
-    Integer requestCount = 1;
+    Integer requestCount = 0;
 
     public Integer getId() {
         return id;
@@ -76,8 +76,8 @@ public abstract class AbstractMeta<T extends AbstractModel> {
     }
 
     protected Boolean needTimeBasedUpdate(){
-        ZonedDateTime updateTime = ZonedDateTime.now(Clock.systemUTC()).plusHours(updateIntervalHours());
-        return lastUpdate.isAfter(updateTime);
+        ZonedDateTime updateTime = lastUpdate.plusHours(updateIntervalHours());
+        return ZonedDateTime.now(Clock.systemUTC()).isAfter(updateTime);
     }
 
     public void queryIncrement(){

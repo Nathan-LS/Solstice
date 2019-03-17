@@ -4,6 +4,7 @@ import solstice.data.RestTemplates.CorporationPublic;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 
 @Entity
@@ -11,17 +12,17 @@ import java.time.ZonedDateTime;
 public class CorporationEntity extends AbstractModel<CorporationMeta>{
     private String name;                        //required
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private AllianceEntity allianceEntity;      //optional
     @Transient
     private Integer allianceIdTransient;        //optional
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private CharacterEntity ceoEntity;          //required
     @Transient
     private Integer ceoIdTransient;             //required
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private CharacterEntity creatorEntity;      //required
     @Transient
     private Integer creatorIdTransient;         //required
@@ -63,7 +64,7 @@ public class CorporationEntity extends AbstractModel<CorporationMeta>{
         ceoIdTransient = t.getCeo_id();
         creatorIdTransient = t.getCreator_id();
         dateFounded = t.getDate_founded();
-        description = t.getDescription();
+        //description = t.getDescription();
         homeStationId = t.getHome_station_id();
         memberCount = t.getMember_count();
         name = t.getName();
@@ -78,8 +79,8 @@ public class CorporationEntity extends AbstractModel<CorporationMeta>{
         return allianceEntity;
     }
 
-    public Integer getAllianceIdTransient() {
-        return allianceIdTransient;
+    public Optional<Integer> getAllianceIdTransient() {
+        return Optional.ofNullable(allianceIdTransient);
     }
 
     public CharacterEntity getCeoEntity() {
@@ -90,9 +91,7 @@ public class CorporationEntity extends AbstractModel<CorporationMeta>{
         return ceoIdTransient;
     }
 
-    public CharacterEntity getCreatorEntity() {
-        return creatorEntity;
-    }
+    public CharacterEntity getCreatorEntity() { return creatorEntity; }
 
     public Integer getCreatorIdTransient() {
         return creatorIdTransient;
@@ -118,9 +117,7 @@ public class CorporationEntity extends AbstractModel<CorporationMeta>{
         return shares;
     }
 
-    public Float getTaxRate() {
-        return taxRate;
-    }
+    public Float getTaxRate() { return taxRate; }
 
     public String getTicker() {
         return ticker;
@@ -132,5 +129,17 @@ public class CorporationEntity extends AbstractModel<CorporationMeta>{
 
     public Boolean getWarEligible() {
         return warEligible;
+    }
+
+    public void setAllianceEntity(Optional<AllianceEntity> allianceEntity) {
+        this.allianceEntity = allianceEntity.isPresent() ? allianceEntity.get() : null;
+    }
+
+    public void setCeoEntity(CharacterEntity ceoEntity) {
+        this.ceoEntity = ceoEntity;
+    }
+
+    public void setCreatorEntity(CharacterEntity creatorEntity) {
+        this.creatorEntity = creatorEntity;
     }
 }

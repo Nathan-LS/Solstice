@@ -1,8 +1,11 @@
 package solstice.data.service.ResponseService;
 
 import solstice.data.ResponseTemplates.EntityBasic;
+import solstice.data.RestTemplates.AlliancePublic;
+import solstice.data.entity.AllianceEntity;
 import solstice.data.entity.CharacterEntity;
 import solstice.data.entity.CorporationEntity;
+import solstice.data.service.updater.AllianceUpdate;
 import solstice.data.service.updater.CharacterUpdate;
 import solstice.data.service.updater.CorporationUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +19,12 @@ public class CharacterAffiliationService {
     @Autowired
     private CorporationUpdate corporationUpdate;
 
+    @Autowired
+    private AllianceUpdate allianceUpdate;
+
 
     public EntityBasic getResponse(Integer lookupId){
-        CharacterEntity c = characterUpdate.getModel(lookupId);
-        CorporationEntity corp = corporationUpdate.getModel(c.getCorporationEntity().getId());
-        return new EntityBasic(c, corp, null);
+        CharacterEntity ch = characterUpdate.getModel(lookupId);
+        return new EntityBasic(ch, ch.getCorporationEntity(), ch.getAllianceEntity());
     }
 }

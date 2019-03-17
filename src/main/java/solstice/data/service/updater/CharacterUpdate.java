@@ -1,8 +1,12 @@
 package solstice.data.service.updater;
 
+import org.springframework.transaction.annotation.Transactional;
 import solstice.data.RestTemplates.CharacterPublic;
+import solstice.data.RestTemplates.CorporationPublic;
+import solstice.data.entity.AllianceEntity;
 import solstice.data.entity.CharacterEntity;
 import solstice.data.entity.CorporationEntity;
+import solstice.data.repository.AllianceRepository;
 import solstice.data.repository.CharacterRepository;
 import solstice.data.repository.CorporationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +18,9 @@ public class CharacterUpdate extends AbstractUpdater <CharacterEntity, Character
     @Autowired
     private CharacterRepository characterRepository;
     @Autowired
-    private CorporationRepository corporationRepository;
+    private CorporationUpdate corporationUpdate;
+    @Autowired
+    private AllianceUpdate allianceUpdate;
 
     @Override
     protected String requestUrl(Integer entityId){
@@ -33,8 +39,8 @@ public class CharacterUpdate extends AbstractUpdater <CharacterEntity, Character
 
     @Override
     protected void loadForeignKeyModels(CharacterEntity model) {
-        loadCorporation(model);
-        loadAlliance(model);
+        model.setCorporationEntity(corporationUpdate.getModelNoCommit(model.getCorporationIdTransient()));
+        model.setAllianceEntity(allianceUpdate.getModelNoCommit(model.getAllianceIdTransient()));
     }
 
     @Override
@@ -45,17 +51,6 @@ public class CharacterUpdate extends AbstractUpdater <CharacterEntity, Character
     @Override
     CharacterEntity repoSave(CharacterEntity model) {
         return characterRepository.save(model);
-    }
-
-    protected void loadCorporation(CharacterEntity characterEntity) {
-        if (characterEntity.updateFkCorp()) {
-            CorporationEntity c = corporationRepository.findOneById(characterEntity.getCorporationIdTransient()).
-                    orElse(new CorporationEntity(characterEntity.getCorporationIdTransient()));
-            characterEntity.setCorporationEntity(c);
-        }
-    }
-
-    protected void loadAlliance(CharacterEntity characterEntity) {
 
     }
 }

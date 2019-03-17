@@ -27,6 +27,9 @@ public class CharacterUpdateTest {
     protected CharacterUpdate characterUpdate;
 
     @Autowired
+    protected CorporationUpdate corporationUpdate;
+
+    @Autowired
     protected CharacterRepository characterRepository;
 
     @Autowired
@@ -50,7 +53,7 @@ public class CharacterUpdateTest {
     public void loadCorporationNew(){
         CharacterEntity c = characterRepository.findOneById(1).get();
         c.setCorporationIdTransient(6);
-        characterUpdate.loadCorporation(c);
+        c.setCorporationEntity(corporationUpdate.getOrCreate(c.getCorporationIdTransient()));
         characterRepository.save(c);
         assert(corporationRepository.count() == 2);
         characterRepository.deleteAll();
@@ -61,7 +64,7 @@ public class CharacterUpdateTest {
     public void loadCorporationExisting(){
         CharacterEntity c = characterRepository.findOneById(1).get();
         c.setCorporationIdTransient(5);
-        characterUpdate.loadCorporation(c);
+        c.setCorporationEntity(corporationUpdate.getOrCreate(c.getCorporationIdTransient()));
         c = characterRepository.save(c);
         CorporationEntity corp = corporationRepository.findOneById(5).get();
         assertEquals("Test Corp", corp.getName());

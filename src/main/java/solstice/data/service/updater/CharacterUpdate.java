@@ -1,5 +1,7 @@
 package solstice.data.service.updater;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Transactional;
 import solstice.data.RestTemplates.CharacterPublic;
 import solstice.data.RestTemplates.CorporationPublic;
@@ -12,11 +14,12 @@ import solstice.data.repository.CorporationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 
 @Service
+@Transactional
 public class CharacterUpdate extends AbstractUpdater <CharacterEntity, CharacterPublic>{
-    @Autowired
-    private CharacterRepository characterRepository;
     @Autowired
     private CorporationUpdate corporationUpdate;
     @Autowired
@@ -33,24 +36,17 @@ public class CharacterUpdate extends AbstractUpdater <CharacterEntity, Character
     }
 
     @Override
-    protected Class<CharacterPublic> apiModel() {
-        return CharacterPublic.class;
-    }
-
-    @Override
+    @Transactional
     protected void loadForeignKeyModels(CharacterEntity model) {
         model.setCorporationEntity(corporationUpdate.getModelNoCommit(model.getCorporationIdTransient()));
         model.setAllianceEntity(allianceUpdate.getModelNoCommit(model.getAllianceIdTransient()));
     }
 
     @Override
-    protected CharacterEntity getOrCreate(Integer id) {
-        return characterRepository.findOneById(id).orElse(new CharacterEntity(id));
-    }
+    protected Class<CharacterEntity> getModelClass() { return CharacterEntity.class; }
 
     @Override
-    CharacterEntity repoSave(CharacterEntity model) {
-        return characterRepository.save(model);
-
+    protected Class<CharacterPublic> apiModel() {
+        return CharacterPublic.class;
     }
 }

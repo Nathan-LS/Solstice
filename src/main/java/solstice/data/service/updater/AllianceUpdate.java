@@ -1,17 +1,14 @@
 package solstice.data.service.updater;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import solstice.data.RestTemplates.AlliancePublic;
 import solstice.data.entity.AllianceEntity;
-import solstice.data.repository.AllianceRepository;
 
 
 @Service
+@Transactional
 public class AllianceUpdate extends AbstractUpdater <AllianceEntity, AlliancePublic>{
-    @Autowired
-    private AllianceRepository allianceRepository;
-
     @Override
     protected String requestUrl(Integer entityId){
         return String.format("https://esi.evetech.net/latest/alliances/%s/?datasource=tranquility", entityId);
@@ -31,13 +28,7 @@ public class AllianceUpdate extends AbstractUpdater <AllianceEntity, AlliancePub
     protected void loadForeignKeyModels(AllianceEntity model) { }
 
     @Override
-    protected AllianceEntity getOrCreate(Integer id) {
-        return allianceRepository.findOneById(id).orElse(new AllianceEntity(id));
+    protected Class<AllianceEntity> getModelClass() {
+        return AllianceEntity.class;
     }
-
-    @Override
-    AllianceEntity repoSave(AllianceEntity model) {
-        return allianceRepository.save(model);
-    }
-
 }

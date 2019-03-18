@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+@Transactional
 public class CorporationUpdate extends AbstractUpdater <CorporationEntity, CorporationPublic>{
     @Autowired
     private CorporationRepository corporationRepository;
@@ -35,19 +36,13 @@ public class CorporationUpdate extends AbstractUpdater <CorporationEntity, Corpo
 
     @Override
     protected void loadForeignKeyModels(CorporationEntity model) {
-        //model.setCeoEntity(characterUpdate.getOrCreate(model.getCeoIdTransient()));
-        //model.setCreatorEntity(characterUpdate.getOrCreate(model.getCreatorIdTransient()));
-        //model.setAllianceEntity(allianceUpdate.getOrCreate(model.getAllianceIdTransient()));
+        model.setCeoEntity(characterUpdate.getModelNoCommit(model.getCeoIdTransient()));
+        model.setCreatorEntity(characterUpdate.getModelNoCommit(model.getCreatorIdTransient()));
+        model.setAllianceEntity(allianceUpdate.getModelNoCommit(model.getAllianceIdTransient()));
     }
 
     @Override
-    protected CorporationEntity getOrCreate(Integer id) {
-        return corporationRepository.findOneById(id).orElse(new CorporationEntity(id));
+    protected Class<CorporationEntity> getModelClass() {
+        return CorporationEntity.class;
     }
-
-    @Override
-    CorporationEntity repoSave(CorporationEntity model) {
-        return corporationRepository.save(model);
-    }
-
 }

@@ -8,7 +8,7 @@ WORKDIR /SolsticeDocker
 RUN git clone https://github.com/Nathan-LS/Solstice.git
 WORKDIR /SolsticeDocker/Solstice
 RUN chmod +x gradlew
-RUN ./gradlew build
+RUN ./gradlew assemble
 WORKDIR /app
 RUN cp /SolsticeDocker/Solstice/build/libs/* . -R
 ENTRYPOINT ["java", "-jar", "solstice-0.0.1-SNAPSHOT.jar"]
